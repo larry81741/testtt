@@ -1,0 +1,18 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./tsconfig.app.json"
+    }
+  ],
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    "baseUrl": ".", 
+    "paths": {
+      "@/*": ["src/components/*"] // @ 符號映射到 src/components 目錄
+    }
+  }
+}
