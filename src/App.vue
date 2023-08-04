@@ -1,6 +1,6 @@
 <script setup>
 import { VueFlow, useVueFlow } from '@vue-flow/core'
-import { nextTick, watch } from 'vue'
+import { nextTick, watch, ref, computed } from 'vue'
 import Sidebar from './Sidebar.vue'
 import ColorSelectorNode from './ColorSelectorNode.vue'
 
@@ -8,19 +8,41 @@ let id = 0
 function getId() {
   return `dndnode_${id++}`
 }
-
-const { findNode, onConnect, addEdges, addNodes, project, vueFlowRef,toObject } = useVueFlow({
+const nodeData = ref({ 1: { input1: '11122233' }, dndnode_0: { input1: '999888777' } })
+const updateData = (id, newData) => {
+  nodeData.value[id] = newData
+  console.log(123, id, newData)
+  console.log(456, nodeData.value)
+}
+const { findNode, onConnect, addEdges, addNodes, project, vueFlowRef, toObject } = useVueFlow({
   nodes: [
     {
       id: '1',
       type: 'test',
       label: 'input node',
-      position: { x: 250, y: 25 },
+      position: { x: 250, y: 25 }
     },
-  ],
+    {
+      id: 'dndnode_0',
+      type: 'test',
+      label: 'input node',
+      position: { x: 350, y: 95 }
+    }
+  ]
 })
-const toObjectt=()=>{
-  console.log(123,toObject());
+const toObjectt = () => {
+  function sortSourceTarget(arr) { //重新排列 點與點之間的關西 目前以 id 升冪排列 未來以type排列
+    return arr.map(({ source, sourceHandle, target, targetHandle, ...rest }) => {
+        if (source > target) {
+            [source, target] = [target, source];
+            [sourceHandle, targetHandle] = [targetHandle, sourceHandle];
+        }
+        return { source, sourceHandle, target, targetHandle, ...rest };
+    });
+  }
+  const newObject=sortSourceTarget(toObject().edges)
+  console.log(123, toObject().edges)
+  console.log(456, newObject)
 }
 function onDragOver(event) {
   event.preventDefault()
@@ -36,17 +58,17 @@ function onDrop(event) {
   const type = event.dataTransfer?.getData('application/vueflow')
 
   const { left, top } = vueFlowRef.value.getBoundingClientRect()
-
+  console.log(vueFlowRef.value.getBoundingClientRect())
   const position = project({
     x: event.clientX - left,
-    y: event.clientY - top,
+    y: event.clientY - top
   })
 
   const newNode = {
     id: getId(),
     type,
     position,
-    label: `${type} node`,
+    label: `${type} node`
   }
 
   addNodes([newNode])
@@ -58,11 +80,14 @@ function onDrop(event) {
       () => node.dimensions,
       (dimensions) => {
         if (dimensions.width > 0 && dimensions.height > 0) {
-          node.position = { x: node.position.x - node.dimensions.width / 2, y: node.position.y - node.dimensions.height / 2 }
+          node.position = {
+            x: node.position.x - node.dimensions.width / 2,
+            y: node.position.y - node.dimensions.height / 2
+          }
           stop()
         }
       },
-      { deep: true, flush: 'post' },
+      { deep: true, flush: 'post' }
     )
   })
 }
@@ -70,19 +95,17 @@ function onDrop(event) {
 
 <template>
   <div class="dndflow" @drop="onDrop">
-
-    <VueFlow @dragover="onDragOver" >
-      <template #node-customs="{ data }">
-        <ColorSelectorNode :data="data"/>
+    <VueFlow @dragover="onDragOver">
+      <template #node-customs="{ id }">
+        <ColorSelectorNode :data="nodeData[id]" :id="id" />
       </template>
-      <template #node-test="{ data }">
-        <ColorSelectorNode :data="data"/>
+      <template #node-test="{ id }">
+        <ColorSelectorNode :data="nodeData[id]" :id="id" @updateData="updateData" />
       </template>
-      <MiniMap :node-stroke-color="nodeStroke" :node-color="nodeColor" />
+      <!-- <MiniMap :node-stroke-color="nodeStroke" :node-color="nodeColor" /> -->
     </VueFlow>
-    <div @click="toObjectt" >1234567890+</div>
+    <div @click="toObjectt">123456789</div>
     <Sidebar />
-
   </div>
 </template>
 <style>

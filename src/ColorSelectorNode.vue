@@ -1,36 +1,51 @@
-<script setup>
+<script setup lang="ts">
 import { Handle, Position } from '@vue-flow/core'
-import { computed } from 'vue'
-
-// const props = defineProps({
-//   data: {
-//     type: Object,
-//     required: true,
-//   },
-// })
-
-const emit = defineEmits(['change', 'gradient'])
-
-function onSelect(color) {
-  emit('change', color)
+import { watch, reactive } from 'vue'
+import {useVueFlow } from '@vue-flow/core'
+const { removeNodes } = useVueFlow()
+const props = defineProps({
+  id: {
+    type: String,
+    default: ''
+  },
+  data: {
+    type: Object,
+    default: () => {
+      return {}
+    }
+  }
+})
+const nodeInputs = reactive({ input1: props.data['input1'] })
+console.log(123456, props.data)
+const emit = defineEmits(['change', 'gradient', 'updateData'])
+const updateValue = () => {
+  emit('updateData', props.id, nodeInputs)
 }
-
-function onGradient() {
-  emit('gradient')
-}
-
-// const sourceHandleStyleA = computed(() => ({ backgroundColor: props.data.color, filter: 'invert(100%)', top: '10px' }))
-
-// const sourceHandleStyleB = computed(() => ({
-//   backgroundColor: props.data.color,
-//   filter: 'invert(100%)',
-//   bottom: '10px',
-//   top: 'auto',
-// }))
+watch(nodeInputs, () => {
+  updateValue()
+})
 </script>
 
 <template>
-  <div style="border: 2px black solid; border-radius: 20px">
+  <div style="border: 2px black solid; border-radius: 20px; position: relative">
+    <div>
+      {{ id }}
+    </div>
+    <button
+      style="
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        padding: 0;
+        width: 20px;
+        border-radius: 100%;
+        background-color: red;
+        color: white;
+      "
+      @click="removeNodes(id,true,true)"
+    >
+      X
+    </button>
     <div>Select a color</div>
     <div
       style="
@@ -45,10 +60,9 @@ function onGradient() {
       "
     >
       <label for="">123456</label>
-      <input type="text" />
+      <input type="text" v-model="nodeInputs.input1" />
     </div>
   </div>
-  
-  <Handle id="a" type="source" :position="Position.Right" />
 
+  <Handle  type="source" :position="Position.Right" />
 </template>
