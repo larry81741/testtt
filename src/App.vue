@@ -11,8 +11,9 @@ function getId() {
 const nodeData = ref({ 1: { input1: '11122233' }, dndnode_0: { input1: '999888777' } })
 const updateData = (id, newData) => {
   nodeData.value[id] = newData
-  console.log(123, id, newData)
-  console.log(456, nodeData.value)
+  console.log("id",id)
+  console.log("newData", newData)
+  console.log("nodeData", nodeData.value)
 }
 const { findNode, onConnect, addEdges, addNodes, project, vueFlowRef, toObject } = useVueFlow({
   nodes: [
@@ -41,8 +42,8 @@ const toObjectt = () => {
     });
   }
   const newObject=sortSourceTarget(toObject().edges)
-  console.log(123, toObject().edges)
-  console.log(456, newObject)
+  console.log("beforeSort", toObject().edges)
+  console.log("afterSort", newObject)
 }
 function onDragOver(event) {
   event.preventDefault()
@@ -104,7 +105,7 @@ function onDrop(event) {
       </template>
       <!-- <MiniMap :node-stroke-color="nodeStroke" :node-color="nodeColor" /> -->
     </VueFlow>
-    <div @click="toObjectt">123456789</div>
+    <div @click="toObjectt">Show節點連結</div>
     <Sidebar />
   </div>
 </template>
